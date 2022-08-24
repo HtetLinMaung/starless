@@ -109,7 +109,7 @@ async function buildForAzure() {
     fs.rmSync(azureProjectFolderPath, { recursive: true });
   }
   const { stdout, stderr } = await exec(
-    `func init ${azureProjectFolderName} --typescript`
+    `func init ${azureProjectFolderName} --typescript --docker`
   );
   console.log(stdout);
   console.error(stderr);
