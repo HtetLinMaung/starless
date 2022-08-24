@@ -67,6 +67,10 @@ async function build() {
 const handler = async (event) => {
   const context = {
     log: (msg) => console.log(\`[\${new Date().toISOString()}] \${msg}\`),
+    executionContext: {
+      functionName:
+        event.path.split("/")[event.path.split("/").length - 1],
+    },
     res: {
       status: 200,
       body: "",
