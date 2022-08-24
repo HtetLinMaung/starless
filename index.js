@@ -130,7 +130,7 @@ azure_function`
       console.log(
         "  *",
         chalk.green("npm run build"),
-        ": Bundles the app for aws lambda.\n"
+        ": Bundles the app for aws lambda and azure function.\n"
       );
       console.log(
         "  *",

@@ -1,8 +1,13 @@
 {
   "functions": {
-    "Hello": {
+    "AwsHello": {
       "route": "hello",
-      "path": "functions/hello",
+      "path": "functions/aws-hello",
+      "methods": ["GET"]
+    },
+    "AzureFunctionHello": {
+      "route": "hello",
+      "path": "functions/azure-function-hello",
       "methods": ["GET"]
     }
   },
