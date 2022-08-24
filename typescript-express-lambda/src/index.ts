@@ -54,6 +54,10 @@ app.listen(PORT, () => {
                     msg
                   )}`
                 ),
+              executionContext: {
+                functionName:
+                  func.path.split("/")[func.path.split("/").length - 1],
+              },
               res: {
                 status: 200,
                 body: "",
