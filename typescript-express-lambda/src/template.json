@@ -1,0 +1,19 @@
+{
+  "functions": {
+    "Hello": {
+      "route": "hello",
+      "path": "functions/hello",
+      "methods": ["GET"]
+    }
+  },
+  "layers": {
+    "common": {
+      "path": "layers/common"
+    }
+  },
+  "build": {
+    "import_paths": {
+      "../../layers/common": "/opt"
+    }
+  }
+}

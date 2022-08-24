@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  express_lambda:
+    image: express_lambda
+    build: .
+    ports:
+      - "7070:7070"
+    
