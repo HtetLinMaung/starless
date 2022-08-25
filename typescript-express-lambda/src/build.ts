@@ -84,7 +84,7 @@ const handler = async (event) => {
     params: event.pathParameters,
     body: JSON.parse(event.body),
   };
-  await httpTrigger(req, context);
+  await httpTrigger(context, req);
   const { status, body, headers } = context.res;
   return {
     statusCode: status || 200,
