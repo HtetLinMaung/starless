@@ -69,7 +69,7 @@ const handler = async (event) => {
     log: (msg) => console.log(\`[\${new Date().toISOString()}] \${msg}\`),
     executionContext: {
       functionName:
-        event.path.split("/")[event.path.split("/").length - 1],
+        event.path ? event.path.split("/")[event.path.split("/").length - 1]: "",
     },
     res: {
       status: 200,
@@ -82,7 +82,7 @@ const handler = async (event) => {
     headers: event.headers,
     query: event.queryStringParameters,
     params: event.pathParameters,
-    body: JSON.parse(event.body),
+    body: event.body ? JSON.parse(event.body): null,
   };
   await httpTrigger(context, req);
   const { status, body, headers } = context.res;
@@ -183,7 +183,7 @@ const httpTrigger: AzureFunction = async function (
     headers: req.headers,
     queryStringParameters: req.query,
     pathParameters: req.params,
-    body: JSON.stringify(req.body),
+    body: req.body ? JSON.stringify(req.body) : null,
   };
   const lambdaResponse: APIGatewayProxyResult = await handler(event);
   context.res = {

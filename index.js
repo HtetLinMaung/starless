@@ -46,7 +46,7 @@ async function main() {
     type: "list",
     message: "Which project you want to generate?",
     // message: "ဘယ်ပရောဂျက်ကို ဖန်တီးချင်လဲ။",
-    choices: ["typescript-express-lambda"],
+    choices: ["starless-app", "typescript-express-lambda"],
   });
   const { folderName } = await inquirer.prompt({
     name: "folderName",
@@ -91,7 +91,7 @@ async function main() {
       );
       console.log(stdout);
       console.log(chalk.red(stderr));
-      let json = JSON.parse(
+      const json = JSON.parse(
         fs.readFileSync(path.join(folderPath, "package.json"), "utf8")
       );
       json["scripts"] = {
@@ -221,6 +221,140 @@ azure_function`
       //   // message: "ဘယ်ပရောဂျက်ကို ဖန်တီးချင်လဲ။",
       //   choices: ["default", "node-express"],
       // });
+      break;
+    case "starless-app":
+      fs.writeFileSync(
+        path.join(folderPath, "tsconfig.json"),
+        JSON.stringify(
+          {
+            compilerOptions: {
+              module: "CommonJS",
+              target: "esnext",
+              noImplicitAny: true,
+              preserveConstEnums: true,
+              outDir: "./",
+              sourceMap: true,
+              rootDir: "./src",
+              esModuleInterop: true,
+              removeComments: true,
+              resolveJsonModule: true,
+            },
+            include: ["src/**/*"],
+            exclude: ["node_modules", "**/*.spec.ts"],
+          },
+          null,
+          2
+        )
+      );
+      fs.cpSync(
+        path.join(__dirname, project, "src"),
+        path.join(folderPath, "src"),
+        {
+          recursive: true,
+        }
+      );
+      for (const filename of ["docker-compose.yml", "Dockerfile"]) {
+        fs.cpSync(
+          path.join(__dirname, project, filename),
+          path.join(folderPath, filename)
+        );
+      }
+
+      spinner.success();
+      // spinner = createSpinner("မှီခိုမှုများကို ထည့်သွင်းနေပါသည်။").start();
+      spinner = createSpinner("Installing dependencies").start();
+      await exec("npm init -y", { cwd: folderPath });
+      const { stdout2, stderr2 } = await exec(
+        "npm i -D @types/aws-lambda @types/node @azure/functions typescript nodemon starless-server",
+        { cwd: folderPath }
+      );
+      if (stdout2) {
+        console.log(stdout2);
+      }
+      if (stderr2) {
+        console.log(chalk.red(stderr2));
+      }
+
+      const json2 = JSON.parse(
+        fs.readFileSync(path.join(folderPath, "package.json"), "utf8")
+      );
+      json2["scripts"] = {
+        start: "tsc && starless-server start",
+        watch: "tsc -w",
+        dev: "nodemon node_modules/starless-server",
+        build: "tsc && starless-server build --azure-functions --aws-lambda",
+      };
+      fs.writeFileSync(
+        path.join(folderPath, "package.json"),
+        JSON.stringify(json2, null, 2)
+      );
+      fs.writeFileSync(
+        path.join(folderPath, ".dockerignore"),
+        `.git
+.gitignore
+node_modules
+dist
+.env
+azure_functions
+aws_lambda`
+      );
+      fs.writeFileSync(
+        path.join(folderPath, ".gitignore"),
+        `node_modules
+dist
+.env
+azure_functions
+aws_lambda`
+      );
+      spinner.success();
+      console.log(`\nSuccess! Created ${folderName} at ${folderPath}\n`);
+      console.log("Inside that directory, you can run several commands: \n");
+      console.log(
+        "  *",
+        chalk.green("npm run watch"),
+        ": Compiles typescript on files change.\n"
+      );
+      console.log(
+        "  *",
+        chalk.green("npm run dev  "),
+        ": Starts the development server with hot reload.\n"
+      );
+      console.log(
+        "  *",
+        chalk.green("npm run build"),
+        ": Bundles the app for aws lambda and azure function.\n"
+      );
+      console.log(
+        "  *",
+        chalk.green("npm start    "),
+        ": Starts the server.\n"
+      );
+      console.log("Happy hacking!\n");
+
+      // console.log(
+      //   `\n${folderPath} တွင် ${folderName} ဖိုင်တွဲအမည်ဖြင့် တည်ဆောက်မှုအောင်မြင်ပါသည်။\n`
+      // );
+      // console.log(
+      //   "ထိုဖိုင်တွဲအတွင်းတွင် လူကြီးမင်းသည် command အများအပြားကို လုပ်ဆောင်နိုင်ပါသည်။\n"
+      // );
+      // console.log(
+      //   "  *",
+      //   chalk.green("npm run dev  "),
+      //   ": Hot reload ဖြင့် ဖွံ့ဖြိုးတိုးတက်ရေးဆာဗာကို စတင်ခြင်း။\n"
+      // );
+      // console.log(
+      //   "  *",
+      //   chalk.green("npm run build"),
+      //   ": aws lambda အတွက် app ကို စုစည်းခြင်း။\n"
+      // );
+      // console.log(
+      //   "  *",
+      //   chalk.green("npm start    "),
+      //   ": ဆာဗာကို စတင်ခြင်း။\n"
+      // );
+      // console.log(
+      //   "ယခုအချိန်မှစ၍ လူကြီးမင်း ပျော်ရွှင်စွာ ပရိုဂရမ်ရေးနိုင်ပါသည်။\n"
+      // );
       break;
   }
 }
