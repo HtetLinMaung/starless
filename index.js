@@ -46,7 +46,7 @@ async function main() {
     type: "list",
     message: "Which project you want to generate?",
     // message: "ဘယ်ပရောဂျက်ကို ဖန်တီးချင်လဲ။",
-    choices: ["starless-app", "typescript-express-lambda"],
+    choices: ["starless-app"],
   });
   const { folderName } = await inquirer.prompt({
     name: "folderName",
@@ -265,7 +265,7 @@ azure_function`
       spinner = createSpinner("Installing dependencies").start();
       await exec("npm init -y", { cwd: folderPath });
       const { stdout2, stderr2 } = await exec(
-        "npm i -D @types/aws-lambda @types/node @azure/functions typescript nodemon starless-server",
+        "npm i -D @types/aws-lambda @types/node @azure/functions @types/express typescript nodemon starless-server",
         { cwd: folderPath }
       );
       if (stdout2) {
@@ -296,7 +296,8 @@ node_modules
 dist
 .env
 azure_functions
-aws_lambda`
+aws_lambda
+*.ts`
       );
       fs.writeFileSync(
         path.join(folderPath, ".gitignore"),
@@ -304,7 +305,9 @@ aws_lambda`
 dist
 .env
 azure_functions
-aws_lambda`
+aws_lambda
+*.js
+*.js.map`
       );
       spinner.success();
       console.log(`\nSuccess! Created ${folderName} at ${folderPath}\n`);
