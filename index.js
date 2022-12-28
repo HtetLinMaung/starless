@@ -281,8 +281,8 @@ azure_function`
       json2["scripts"] = {
         start: "tsc && starless-server start",
         watch: "tsc -w",
-        dev: "nodemon node_modules/starless-server",
-        build: "tsc && starless-server build --azure-functions --aws-lambda",
+        dev: "nodemon node_modules/starless-server start",
+        build: "tsc && starless-server build --azure-functions --aws-sam-lambda",
       };
       fs.writeFileSync(
         path.join(folderPath, "package.json"),
