@@ -394,7 +394,7 @@ aws_lambda
       spinner = createSpinner("Installing dependencies").start();
       await exec("npm init -y", { cwd: folderPath });
       const { stdout3, stderr3 } = await exec(
-        "npm i -D @types/node typescript jest @types/jest ts-jest",
+        "npm i -D @types/node typescript jest @types/jest ts-jest && npm i chalk@4.1.2 inquirer nanospinner",
         { cwd: folderPath }
       );
       if (stdout3) {
