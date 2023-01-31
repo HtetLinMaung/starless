@@ -424,16 +424,16 @@ aws_lambda
       console.log("Inside that directory, you can run several commands: \n");
       console.log(
         "  *",
-        chalk.green("npm run build"),
+        chalk.green("npm run build  "),
         ": Compiles typescript.\n"
       );
       console.log(
         "  *",
-        chalk.green("npm run test  "),
+        chalk.green("npm run test   "),
         ": Unit Test with jest.\n"
       );
       console.log("  *", chalk.green("npm run release"), ": Publish to npm.\n");
-      console.log("  *", chalk.green("npm start    "), ": Run App.\n");
+      console.log("  *", chalk.green("npm start      "), ": Run App.\n");
       console.log("Happy hacking!\n");
       break;
   }
