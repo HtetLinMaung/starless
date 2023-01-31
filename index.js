@@ -46,7 +46,7 @@ async function main() {
     type: "list",
     message: "Which project you want to generate?",
     // message: "ဘယ်ပရောဂျက်ကို ဖန်တီးချင်လဲ။",
-    choices: ["starless-app"],
+    choices: ["starless-app", "command-line-app"],
   });
   const { folderName } = await inquirer.prompt({
     name: "folderName",
@@ -86,7 +86,7 @@ async function main() {
       spinner = createSpinner("Installing dependencies").start();
       await exec("npm init -y", { cwd: folderPath });
       const { stdout, stderr } = await exec(
-        "npm i -D @types/adm-zip @types/aws-lambda @types/cors @types/express @types/node @azure/functions chalk@4.1.2 adm-zip cors dotenv express nodemon ts-node typescript",
+        "npm i -D @types/adm-zip @types/aws-lambda @types/cors @types/express @types/node @azure/functions chalk@4.1.2 adm-zip cors dotenv express nodemon ts-node",
         { cwd: folderPath }
       );
       console.log(stdout);
@@ -265,7 +265,7 @@ azure_function`
       spinner = createSpinner("Installing dependencies").start();
       await exec("npm init -y", { cwd: folderPath });
       const { stdout2, stderr2 } = await exec(
-        "npm i -D @types/aws-lambda @types/node @azure/functions @types/express typescript nodemon starless-server",
+        "npm i -D @types/aws-lambda @types/node @azure/functions @types/express typescript nodemon starless-server jest @types/jest ts-jest",
         { cwd: folderPath }
       );
       if (stdout2) {
@@ -274,7 +274,7 @@ azure_function`
       if (stderr2) {
         console.log(chalk.red(stderr2));
       }
-
+      await exec("npx ts-jest config:init", { cwd: folderPath });
       const json2 = JSON.parse(
         fs.readFileSync(path.join(folderPath, "package.json"), "utf8")
       );
@@ -282,7 +282,9 @@ azure_function`
         start: "tsc && starless-server start",
         watch: "tsc -w",
         dev: "nodemon node_modules/starless-server start",
-        build: "tsc && starless-server build --azure-functions --aws-sam-lambda",
+        build:
+          "tsc && starless-server build --azure-functions --aws-sam-lambda",
+        test: "jest --verbose",
       };
       fs.writeFileSync(
         path.join(folderPath, "package.json"),
@@ -307,7 +309,8 @@ dist
 azure_functions
 aws_lambda
 *.js
-*.js.map`
+*.js.map
+!jest.config.js`
       );
       spinner.success();
       console.log(`\nSuccess! Created ${folderName} at ${folderPath}\n`);
@@ -358,6 +361,80 @@ aws_lambda
       // console.log(
       //   "ယခုအချိန်မှစ၍ လူကြီးမင်း ပျော်ရွှင်စွာ ပရိုဂရမ်ရေးနိုင်ပါသည်။\n"
       // );
+      break;
+    case "command-line-app":
+      fs.writeFileSync(
+        path.join(folderPath, "tsconfig.json"),
+        JSON.stringify(
+          {
+            compilerOptions: {
+              target: "es6",
+              module: "commonjs",
+              declaration: true,
+              outDir: "./",
+              strict: false,
+              esModuleInterop: true,
+              removeComments: true,
+            },
+            include: ["src"],
+            exclude: ["node_modules", "**/__tests__/*", "test"],
+          },
+          null,
+          2
+        )
+      );
+      fs.cpSync(
+        path.join(__dirname, project, "src"),
+        path.join(folderPath, "src"),
+        {
+          recursive: true,
+        }
+      );
+      spinner.success();
+      spinner = createSpinner("Installing dependencies").start();
+      await exec("npm init -y", { cwd: folderPath });
+      const { stdout3, stderr3 } = await exec(
+        "npm i -D @types/node typescript jest @types/jest ts-jest",
+        { cwd: folderPath }
+      );
+      if (stdout3) {
+        console.log(stdout3);
+      }
+      if (stderr3) {
+        console.log(chalk.red(stderr3));
+      }
+      await exec("npx ts-jest config:init", { cwd: folderPath });
+      const json3 = JSON.parse(
+        fs.readFileSync(path.join(folderPath, "package.json"), "utf8")
+      );
+      json3["scripts"] = {
+        build: "tsc",
+        start: "node .",
+        test: "jest --verbose",
+        release: "tsc && npm publish",
+      };
+      json3["bin"] = "./index.js";
+      fs.writeFileSync(
+        path.join(folderPath, "package.json"),
+        JSON.stringify(json3, null, 2)
+      );
+      fs.writeFileSync(path.join(folderPath, ".gitignore"), `node_modules`);
+      spinner.success();
+      console.log(`\nSuccess! Created ${folderName} at ${folderPath}\n`);
+      console.log("Inside that directory, you can run several commands: \n");
+      console.log(
+        "  *",
+        chalk.green("npm run build"),
+        ": Compiles typescript.\n"
+      );
+      console.log(
+        "  *",
+        chalk.green("npm run test  "),
+        ": Unit Test with jest.\n"
+      );
+      console.log("  *", chalk.green("npm run release"), ": Publish to npm.\n");
+      console.log("  *", chalk.green("npm start    "), ": Run App.\n");
+      console.log("Happy hacking!\n");
       break;
   }
 }
